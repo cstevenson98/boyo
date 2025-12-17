@@ -1,7 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
+
+#include "statement/expression.hpp"
 
 namespace boyo {
 
@@ -11,15 +14,18 @@ class Statement {
 
   // Generate the C++ code for this statement
   virtual std::string GenerateCode() const = 0;
+
+  // Get the expressions in this statement
+  const ExpressionList& GetExpressions() const { return expressions_; }
+
+ protected:
+  ExpressionList expressions_;
 };
 
 class PrintStatement : public Statement {
  public:
-  PrintStatement(const std::vector<std::uint8_t>& byte_string);
+  explicit PrintStatement(ExpressionList expressions);
   std::string GenerateCode() const override;
-
- private:
-  std::vector<std::uint8_t> byte_string_;
 };
 
 }  // namespace boyo

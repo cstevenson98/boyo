@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "statement.hpp"
+#include "parser/parser.hpp"
+#include "statement/statement.hpp"
 
 namespace boyo {
 
@@ -33,8 +34,7 @@ class Compiler {
                                              const std::string& generated_code);
 
   // Generate the C++ code for the given statements
-  static std::string GenerateProgramCode(
-      const std::vector<std::unique_ptr<Statement>>& statements);
+  static std::string GenerateProgramCode(const StatementList& statements);
 
   // Compile the given lines into C++ code
   void compile(const std::vector<std::string>& lines,
@@ -45,3 +45,4 @@ class Compiler {
 };
 
 }  // namespace boyo
+

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "parser.hpp"
+#include "parser/parser.hpp"
 
 namespace boyo {
 namespace {
@@ -15,8 +15,9 @@ TEST(ParserTest, Parse_ParsesComments) {
   EXPECT_EQ(statements.size(), 2);
   EXPECT_EQ(statements[0]->GenerateCode(), "// // This is a comment\n");
   EXPECT_EQ(statements[1]->GenerateCode(),
-            "std::cout << \" Hello World\" << std::endl;\n");
+            "std::cout << \"Hello World\" << std::endl;\n");
 }
 
 }  // namespace
 }  // namespace boyo
+

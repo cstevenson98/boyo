@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "cli.hpp"
-#include "compiler.hpp"
+#include "compiler/compiler.hpp"
 
 int main(int argc, char* argv[]) {
   cli::CliExecutor executor("boyo", "Boyo compiler");
@@ -14,9 +14,9 @@ int main(int argc, char* argv[]) {
 
   // Add output flag
   executor.add_flag
-  
-  ("-o,--output", cli::FlagType::MultiArg,
-                    "Output file path (required)", true);
+
+      ("-o,--output", cli::FlagType::MultiArg, "Output file path (required)",
+       true);
 
   // Set handler for command-less mode
   executor.set_handler([](const cli::ParseResult& result) {

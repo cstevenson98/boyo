@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "compiler.hpp"
-#include "parser.hpp"
+#include "compiler/compiler.hpp"
+#include "parser/parser.hpp"
 
 namespace boyo {
 namespace {
@@ -20,7 +20,7 @@ TEST_F(CompilerTest, TestGenerateProgramCode_GeneratesProgramCode) {
   std::vector<std::string> lines = {"print Hello World"};
   auto statements = Parser().Parse(lines);
   auto program_code = Compiler::GenerateProgramCode(statements);
-  EXPECT_EQ(program_code, "std::cout << \" Hello World\" << std::endl;\n");
+  EXPECT_EQ(program_code, "std::cout << \"Hello World\" << std::endl;\n");
 }
 
 TEST_F(CompilerTest, TestSubstituteGeneratedCode_SubstitutesGeneratedCode) {
@@ -32,7 +32,7 @@ TEST_F(CompilerTest, TestSubstituteGeneratedCode_SubstitutesGeneratedCode) {
     }
   )";
 
-  auto generated_code = "std::cout << \" Hello World\" << std::endl;\n";
+  auto generated_code = "std::cout << \"Hello World\" << std::endl;\n";
   auto substituted_code =
       Compiler::SubstituteGeneratedCode(main_function, generated_code);
   // After substitution: {boyo_program_start} is replaced with generated_code,
@@ -40,7 +40,7 @@ TEST_F(CompilerTest, TestSubstituteGeneratedCode_SubstitutesGeneratedCode) {
   // it
   EXPECT_EQ(substituted_code,
             "\n    #include <iostream>\n    int main() {\n      std::cout << "
-            "\" Hello World\" << std::endl;\n\n      \n    }\n  ");
+            "\"Hello World\" << std::endl;\n\n      \n    }\n  ");
 }
 
 TEST_F(CompilerTest, Compile_CompilesProgram) {
@@ -51,3 +51,4 @@ TEST_F(CompilerTest, Compile_CompilesProgram) {
 
 }  // namespace
 }  // namespace boyo
+

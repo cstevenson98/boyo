@@ -1,10 +1,16 @@
-#include "compiler.hpp"
+#include "compiler/compiler.hpp"
+
+#include <sys/wait.h>
 
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
+#include <memory>
+#include <sstream>
 #include <string>
 
-#include "parser.hpp"
+#include "parser/parser.hpp"
+#include "statement/statement.hpp"
 
 namespace boyo {
 
@@ -72,8 +78,7 @@ std::string Compiler::SubstituteGeneratedCode(
   return result;
 }
 
-std::string Compiler::GenerateProgramCode(
-    const std::vector<std::unique_ptr<Statement>>& statements) {
+std::string Compiler::GenerateProgramCode(const StatementList& statements) {
   std::string program_code;
   for (const auto& statement : statements) {
     program_code += statement->GenerateCode();
@@ -111,16 +116,54 @@ void Compiler::compile(const std::vector<std::string>& lines,
   cpp_out.close();
 
   // Compile the C++ file to the output binary
-  std::string command =
-      gpp_path + " -std=c++17 -o " + output_file + " " + temp_cpp_file;
-  int result = system(command.c_str());
+  std::string command = gpp_path + " -std=c++17 -o " + output_file + " " +
+                        temp_cpp_file + " 2>&1";
+
+  // Capture compiler output
+  FILE* pipe = popen(command.c_str(), "r");
+  if (!pipe) {
+    std::remove(temp_cpp_file.c_str());
+    std::fprintf(stderr, "Error: Failed to execute compiler command\n");
+    throw std::runtime_error("Failed to execute compiler command");
+  }
+
+  std::string compiler_output;
+  char buffer[128];
+  while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+    compiler_output += buffer;
+  }
+
+  int result = pclose(pipe);
+  int exit_code = 0;
+  if (WIFEXITED(result)) {
+    exit_code = WEXITSTATUS(result);
+  } else {
+    exit_code = result;
+  }
 
   // Clean up the temporary C++ file
   std::remove(temp_cpp_file.c_str());
 
-  if (result != 0) {
+  if (exit_code != 0) {
+    // Log boyo error first
     std::fprintf(stderr, "Error: Failed to compile program: %s\n",
                  output_file.c_str());
+
+    // Then log compiler output with proper formatting
+    if (!compiler_output.empty()) {
+      std::fprintf(stderr, "\nCompiler output:\n");
+      std::istringstream iss(compiler_output);
+      std::string line;
+      while (std::getline(iss, line)) {
+        // Remove trailing newline if present (getline already does this, but be
+        // safe)
+        if (!line.empty() && line.back() == '\n') {
+          line.pop_back();
+        }
+        std::fprintf(stderr, "| %s\n", line.c_str());
+      }
+    }
+
     throw std::runtime_error("Failed to compile program: " + output_file);
   }
 }
