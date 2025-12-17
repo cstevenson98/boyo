@@ -1,0 +1,87 @@
+# Build directories
+build/
+cmake-build-*/
+
+# Compiled binaries
+*.exe
+*.out
+*.app
+boyo
+hello
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# Conan
+conan.lock
+conanbuildinfo.*
+conaninfo.txt
+conanbuild.sh
+conanrun.sh
+conanbuildenv-*.sh
+conanrunenv-*.sh
+deactivate_conanbuild.sh
+deactivate_conanrun.sh
+deactivate_conanbuildenv-*.sh
+.generators/
+
+# Python virtual environments
+.venv/
+venv/
+ENV/
+env/
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE - VSCode (keep settings but ignore some generated files)
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/.ropeproject
+.vscode/settings.json
+
+# Cache directories
+.cache/
+
+# IDE - Other
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
+*.bak
+*.tmp
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Coverage
+*.gcov
+*.gcda
+*.gcno
+
+# Test results
+test-results/
+*.xml
+
