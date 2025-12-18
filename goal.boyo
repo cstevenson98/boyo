@@ -1,0 +1,14 @@
+// A goal syntax for boyo
+// Keyworks: let print def
+// Operators + - *
+
+
+let A = 0x10 // register, just creates a global variable vector of bytes
+
+print A // keywork print which has IO (not pure functional), prints std::err
+
+def double _a => * 0x10 _a // All operators are polish left handed notation
+
+main double A // Main is the finally run the statement to the right, and returns in std::out
+
+// Prints: 0x100

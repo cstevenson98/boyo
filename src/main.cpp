@@ -6,27 +6,25 @@
 #include "cli.hpp"
 #include "compiler/compiler.hpp"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   cli::CliExecutor executor("boyo", "Boyo compiler");
 
   // Set usage string
   executor.set_usage("<input.boyo> -o <output>");
 
   // Add output flag
-  executor.add_flag
-
-      ("-o,--output", cli::FlagType::MultiArg, "Output file path (required)",
-       true);
+  executor.add_flag("-o,--output", cli::FlagType::MultiArg,
+                    "Output file path (required)", true);
 
   // Set handler for command-less mode
-  executor.set_handler([](const cli::ParseResult& result) {
+  executor.set_handler([](const cli::ParseResult &result) {
     // Get input file (first positional argument)
     if (result.positional_args.empty()) {
       std::fprintf(stderr, "Error: No input file specified\n");
       return 1;
     }
 
-    const std::string& input_file = result.positional_args[0];
+    const std::string &input_file = result.positional_args[0];
 
     // Get output file
     auto output_args = result.get_args("--output");
@@ -36,7 +34,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
 
-    const std::string& output_file = output_args[0];
+    const std::string &output_file = output_args[0];
 
     // Read the input file
     std::ifstream in(input_file);
@@ -59,7 +57,7 @@ int main(int argc, char* argv[]) {
       boyo::Compiler compiler;
       compiler.compile(lines, output_file);
       return 0;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
       std::fprintf(stderr, "Error: %s\n", e.what());
       return 1;
     }
