@@ -1,6 +1,7 @@
 # Unit tests executable
 add_executable(test_boyo
     compiler/compiler_tests.cpp
+    lexer/lexer_tests.cpp
     statement/statement_tests.cpp
     parser/parser_tests.cpp
     expression/expression_tests.cpp

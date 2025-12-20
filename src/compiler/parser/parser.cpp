@@ -10,30 +10,30 @@ namespace boyo {
 
 // Simple statement implementation for now
 class CommentStatement : public Statement {
- public:
-  explicit CommentStatement(const std::string& line) : line_(line) {}
+public:
+  explicit CommentStatement(const std::string &line) : line_(line) {}
 
   std::string GenerateCode() const override {
     // For now, just return a comment with the original line
     return "// " + line_ + "\n";
   }
 
- private:
+private:
   std::string line_;
 };
 
 // Helper function to split a string into tokens
 // For "print" statements, treats everything after "print" as a single literal
-std::vector<std::string> SplitIntoTokens(const std::string& line) {
+std::vector<std::string> SplitIntoTokens(const std::string &line) {
   std::vector<std::string> tokens;
 
   if (line.starts_with("print ")) {
     // Special handling for print: first token is "print", rest is literal
     tokens.push_back("print");
-    if (line.length() > 6) {             // "print " is 6 chars
-      tokens.push_back(line.substr(6));  // Everything after "print "
+    if (line.length() > 6) {            // "print " is 6 chars
+      tokens.push_back(line.substr(6)); // Everything after "print "
     } else {
-      tokens.push_back("");  // Empty literal if just "print"
+      tokens.push_back(""); // Empty literal if just "print"
     }
   } else {
     // For other lines, split by whitespace
@@ -47,10 +47,10 @@ std::vector<std::string> SplitIntoTokens(const std::string& line) {
   return tokens;
 }
 
-StatementList Parser::Parse(const std::vector<std::string>& lines) const {
+StatementList Parser::Parse(const std::vector<std::string> &lines) const {
   StatementList statements;
 
-  for (const auto& line : lines) {
+  for (const auto &line : lines) {
     if (line.empty()) {
       continue;
     }
@@ -60,7 +60,7 @@ StatementList Parser::Parse(const std::vector<std::string>& lines) const {
       // Parse the line into tokens and create expressions
       auto tokens = SplitIntoTokens(line);
       ExpressionList expressions;
-      for (const auto& token : tokens) {
+      for (const auto &token : tokens) {
         expressions.push_back(CreateExpression(token));
       }
 
@@ -77,4 +77,4 @@ StatementList Parser::Parse(const std::vector<std::string>& lines) const {
   return statements;
 }
 
-}  // namespace boyo
+} // namespace boyo
