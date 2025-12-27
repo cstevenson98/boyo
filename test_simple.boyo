@@ -1,0 +1,4 @@
+// Simple test program
+let A 0x10
+def double _a => * 0x02 _a
+main double A

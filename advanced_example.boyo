@@ -1,0 +1,30 @@
+// Advanced Boyo Example: Mathematical Operations
+// This program demonstrates nested operations, multiple functions,
+// and complex expressions
+
+// Define some base values
+let BASE 0x05
+let MULTIPLIER 0x03
+let OFFSET 0x0A
+
+// Simple function: add two parameters
+def add_two _x _y => + _x _y
+
+// Function with nested operations: (a + b) * c
+def add_then_multiply _a _b _c => * + _a _b _c
+
+// Complex function: ((x * 2) + y) - z
+def complex_calc _x _y _z => - + * _x 0x02 _y _z
+
+// Function that uses multiple operations: (a + b) * (c + d)
+def multiply_sums _a _b _c _d => * + _a _b + _c _d
+
+// Chain multiple operations: (((a + b) * c) + d)
+def mega_calc _a _b _c _d => + * + _a _b _c _d
+
+// Use BASE with nested operations: (BASE * 4) + (MULTIPLIER * 2)
+def use_globals => + * BASE 0x04 * MULTIPLIER 0x02
+
+// Entry point: compute use_globals
+main use_globals
+

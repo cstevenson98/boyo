@@ -36,6 +36,9 @@ class Compiler {
   // Generate the C++ code for the given statements
   static std::string GenerateProgramCode(const StatementList& statements);
 
+  // Get the main function template snippet
+  static std::string GetMainFunctionSnippet();
+
   // Compile the given lines into C++ code
   void compile(const std::vector<std::string>& lines,
                const std::string& output_file);

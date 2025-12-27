@@ -5,16 +5,22 @@
 
 #include "cli.hpp"
 #include "compiler/compiler.hpp"
+#include "parser/parser.hpp"
+#include "utils/code_printer.hpp"
 
 int main(int argc, char *argv[]) {
   cli::CliExecutor executor("boyo", "Boyo compiler");
 
   // Set usage string
-  executor.set_usage("<input.boyo> -o <output>");
+  executor.set_usage("<input.boyo> [-o <output>] [--print-code]");
 
   // Add output flag
   executor.add_flag("-o,--output", cli::FlagType::MultiArg,
-                    "Output file path (required)", true);
+                    "Output file path (required unless --print-code is used)", false);
+
+  // Add print-code flag
+  executor.add_flag("--print-code", cli::FlagType::Boolean,
+                    "Print generated C++ code without compiling", false);
 
   // Set handler for command-less mode
   executor.set_handler([](const cli::ParseResult &result) {
@@ -26,15 +32,16 @@ int main(int argc, char *argv[]) {
 
     const std::string &input_file = result.positional_args[0];
 
-    // Get output file
+    // Check if --print-code flag is set
+    bool print_code = result.has_flag("--print-code");
+
+    // Get output file (required unless --print-code is used)
     auto output_args = result.get_args("--output");
-    if (output_args.empty()) {
+    if (!print_code && output_args.empty()) {
       std::fprintf(stderr,
                    "Error: Output file not specified (use -o or --output)\n");
       return 1;
     }
-
-    const std::string &output_file = output_args[0];
 
     // Read the input file
     std::ifstream in(input_file);
@@ -52,11 +59,28 @@ int main(int argc, char *argv[]) {
     }
     in.close();
 
-    // Compile the program
     try {
-      boyo::Compiler compiler;
-      compiler.compile(lines, output_file);
-      return 0;
+      if (print_code) {
+        // Parse and generate code without compiling
+        boyo::Parser parser;
+        auto statements = parser.Parse(lines);
+        auto program_code = boyo::Compiler::GenerateProgramCode(statements);
+        auto full_code = boyo::Compiler::SubstituteGeneratedCode(
+            boyo::Compiler::GetMainFunctionSnippet(), program_code);
+
+        // Print the generated code with formatting
+        boyo::CodePrinter printer;
+        printer.Print(full_code);
+        return 0;
+      } else {
+        // Compile the program normally
+        const std::string &output_file = output_args[0];
+        boyo::Compiler compiler;
+        compiler.compile(lines, output_file);
+        std::printf("Successfully compiled %s -> %s\n", input_file.c_str(),
+                    output_file.c_str());
+        return 0;
+      }
     } catch (const std::exception &e) {
       std::fprintf(stderr, "Error: %s\n", e.what());
       return 1;

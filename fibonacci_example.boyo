@@ -1,0 +1,28 @@
+// Fibonacci-style Example: Computing sequences
+// This demonstrates deeply nested expressions and multiple dependencies
+
+// Initial Fibonacci-like values
+let FIB_0 0x01
+let FIB_1 0x01
+
+// Helper: add three values
+def add_three _a _b _c => + + _a _b _c
+
+// Helper: multiply and add (a * b) + c
+def mul_add _a _b _c => + * _a _b _c
+
+// Compute next Fibonacci: fib(n) = fib(n-1) + fib(n-2)
+def fib_next _prev _curr => + _prev _curr
+
+// Complex: ((a + b) * c) + ((d + e) * f)
+def dual_product_sum _a _b _c _d _e _f => + * + _a _b _c * + _d _e _f
+
+// Ultra nested: (((a + b) * (c + d)) + ((e + f) * (g + h)))
+def quad_sum _a _b _c _d _e _f _g _h => + * + _a _b + _c _d * + _e _f + _g _h
+
+// Compute: (FIB_0 * 3) + (FIB_1 * 5) + 0x0A
+def weighted_fib => + + * FIB_0 0x03 * FIB_1 0x05 0x0A
+
+// Main: execute weighted_fib
+main weighted_fib
+

@@ -1,14 +1,11 @@
 // A goal syntax for boyo
-// Keyworks: let print def
-// Operators + - *
+// Keywords: let def main
+// Operators: + - *
 
+let A 0x10
 
-let A = 0x10 // register, just creates a global variable vector of bytes
+def times_two _a => * 0x02 _a
 
-print A // keywork print which has IO (not pure functional), prints std::err
+main times_two A
 
-def double _a => * 0x10 _a // All operators are polish left handed notation
-
-main double A // Main is the finally run the statement to the right, and returns in std::out
-
-// Prints: 0x100
+// This should output the doubled value of A

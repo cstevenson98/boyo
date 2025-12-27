@@ -5,6 +5,7 @@ add_executable(test_boyo
     statement/statement_tests.cpp
     parser/parser_tests.cpp
     expression/expression_tests.cpp
+    utils/code_printer_tests.cpp
 )
 
 target_link_libraries(test_boyo PRIVATE

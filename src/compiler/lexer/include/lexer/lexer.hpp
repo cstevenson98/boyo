@@ -18,13 +18,15 @@ public:
     KEYWORD_LET,       // let
     KEYWORD_DEF,       // def
     KEYWORD_MAIN,      // main
-    IDENTIFIER,        // A-Z
-    PARAM_IDENTIFIER,  // _a, _b, _c, etc.
+    KEYWORD_PRINT,     // print
+    IDENTIFIER,        // User-defined names: variables, functions
+    PARAM_IDENTIFIER,  // _a, _b, _c, etc. (function parameters)
     OPERATOR_PLUS,     // +
     OPERATOR_MINUS,    // -
     OPERATOR_MULTIPLY, // *
+    EQUALS,            // =
+    ARROW,             // =>
     HEX_LITERAL,       // 0x1234
-    UNKNOWN,           // Unknown token
     COMMENT,           // // comment
     END_OF_FILE,       // End of file
   };

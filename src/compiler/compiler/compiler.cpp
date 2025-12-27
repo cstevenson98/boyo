@@ -23,8 +23,57 @@ const std::string kBoyoProgramEndString = "{boyo_program_end}";
 const std::string kMainFunctionSnippet =
     R"(
     #include <iostream>
+    #include <vector>
+    #include <cstdint>
+    
+    // Helper function to print vectors
+    void print_vector(std::ostream& os, const std::vector<uint8_t>& vec) {
+        for (const auto& byte : vec) {
+            os << std::hex << static_cast<int>(byte) << " ";
+        }
+        os << std::dec << std::endl;
+    }
+    
+    // Helper functions for vector operations
+    std::vector<uint8_t> add_vectors(const std::vector<uint8_t>& a, const std::vector<uint8_t>& b) {
+        std::vector<uint8_t> result;
+        size_t max_size = std::max(a.size(), b.size());
+        result.reserve(max_size);
+        for (size_t i = 0; i < max_size; ++i) {
+            uint8_t val_a = (i < a.size()) ? a[i] : 0;
+            uint8_t val_b = (i < b.size()) ? b[i] : 0;
+            result.push_back(val_a + val_b);
+        }
+        return result;
+    }
+    
+    std::vector<uint8_t> subtract_vectors(const std::vector<uint8_t>& a, const std::vector<uint8_t>& b) {
+        std::vector<uint8_t> result;
+        size_t max_size = std::max(a.size(), b.size());
+        result.reserve(max_size);
+        for (size_t i = 0; i < max_size; ++i) {
+            uint8_t val_a = (i < a.size()) ? a[i] : 0;
+            uint8_t val_b = (i < b.size()) ? b[i] : 0;
+            result.push_back(val_a - val_b);
+        }
+        return result;
+    }
+    
+    std::vector<uint8_t> multiply_vectors(const std::vector<uint8_t>& a, const std::vector<uint8_t>& b) {
+        std::vector<uint8_t> result;
+        size_t max_size = std::max(a.size(), b.size());
+        result.reserve(max_size);
+        for (size_t i = 0; i < max_size; ++i) {
+            uint8_t val_a = (i < a.size()) ? a[i] : 0;
+            uint8_t val_b = (i < b.size()) ? b[i] : 0;
+            result.push_back(val_a * val_b);
+        }
+        return result;
+    }
+    
+    {boyo_program_start}
+    
     int main() {
-        {boyo_program_start}
         {boyo_program_end}
         return 0;
     }
@@ -36,20 +85,20 @@ Compiler::Compiler() : data_(new int(42)) {}
 
 Compiler::~Compiler() { delete data_; }
 
-Compiler::Compiler(const Compiler& other) : data_(new int(*other.data_)) {}
+Compiler::Compiler(const Compiler &other) : data_(new int(*other.data_)) {}
 
-Compiler& Compiler::operator=(const Compiler& other) {
+Compiler &Compiler::operator=(const Compiler &other) {
   if (this != &other) {
     *data_ = *other.data_;
   }
   return *this;
 }
 
-Compiler::Compiler(Compiler&& other) noexcept : data_(other.data_) {
+Compiler::Compiler(Compiler &&other) noexcept : data_(other.data_) {
   other.data_ = nullptr;
 }
 
-Compiler& Compiler::operator=(Compiler&& other) noexcept {
+Compiler &Compiler::operator=(Compiler &&other) noexcept {
   if (this != &other) {
     delete data_;
     data_ = other.data_;
@@ -59,32 +108,57 @@ Compiler& Compiler::operator=(Compiler&& other) noexcept {
 }
 
 // Substitute generated code into the main function
-std::string Compiler::SubstituteGeneratedCode(
-    const std::string& main_function, const std::string& generated_code) {
+std::string
+Compiler::SubstituteGeneratedCode(const std::string &main_function,
+                                  const std::string &generated_code) {
   std::string result = main_function;
 
-  // Replace {boyo_program_start} with the generated code
-  size_t start_pos = result.find(kBoyoProgramStartString);
-  if (start_pos != std::string::npos) {
-    result.replace(start_pos, kBoyoProgramStartString.length(), generated_code);
+  // Split generated_code into global and main parts
+  std::string global_code;
+  std::string main_code;
+
+  size_t split_pos = generated_code.find("{boyo_split_point}");
+  if (split_pos != std::string::npos) {
+    global_code = generated_code.substr(0, split_pos);
+    main_code = generated_code.substr(
+        split_pos + 18); // 18 is length of "{boyo_split_point}"
+  } else {
+    // No split point, put everything as global
+    global_code = generated_code;
   }
 
-  // Remove {boyo_program_end}
+  // Replace {boyo_program_start} with global code (variables and functions)
+  size_t start_pos = result.find(kBoyoProgramStartString);
+  if (start_pos != std::string::npos) {
+    result.replace(start_pos, kBoyoProgramStartString.length(), global_code);
+  }
+
+  // Replace {boyo_program_end} with main code
   size_t end_pos = result.find(kBoyoProgramEndString);
   if (end_pos != std::string::npos) {
-    result.replace(end_pos, kBoyoProgramEndString.length(), "");
+    result.replace(end_pos, kBoyoProgramEndString.length(), main_code);
   }
 
   return result;
 }
 
-std::string Compiler::GenerateProgramCode(const StatementList& statements) {
-  std::string program_code;
-  for (const auto& statement : statements) {
-    program_code += statement->GenerateCode();
+std::string Compiler::GenerateProgramCode(const StatementList &statements) {
+  std::string global_code; // Variables and functions
+  std::string main_code;   // Main execution code
+
+  for (const auto &statement : statements) {
+    // Check if this is a MainStatement by trying to dynamic_cast
+    if (dynamic_cast<const MainStatement *>(statement.get())) {
+      main_code += statement->GenerateCode();
+    } else {
+      global_code += statement->GenerateCode();
+    }
   }
-  return program_code;
+
+  return global_code + "{boyo_split_point}" + main_code;
 }
+
+std::string Compiler::GetMainFunctionSnippet() { return kMainFunctionSnippet; }
 
 /**
   Compile the given lines of code into a binary executable
@@ -93,8 +167,8 @@ std::string Compiler::GenerateProgramCode(const StatementList& statements) {
   @return The path to the compiled executable
   @throws std::runtime_error if the program fails to compile
 */
-void Compiler::compile(const std::vector<std::string>& lines,
-                       const std::string& output_file) {
+void Compiler::compile(const std::vector<std::string> &lines,
+                       const std::string &output_file) {
   Parser parser;
   auto statements = parser.Parse(lines);
 
@@ -120,7 +194,7 @@ void Compiler::compile(const std::vector<std::string>& lines,
                         temp_cpp_file + " 2>&1";
 
   // Capture compiler output
-  FILE* pipe = popen(command.c_str(), "r");
+  FILE *pipe = popen(command.c_str(), "r");
   if (!pipe) {
     std::remove(temp_cpp_file.c_str());
     std::fprintf(stderr, "Error: Failed to execute compiler command\n");
@@ -168,4 +242,4 @@ void Compiler::compile(const std::vector<std::string>& lines,
   }
 }
 
-}  // namespace boyo
+} // namespace boyo

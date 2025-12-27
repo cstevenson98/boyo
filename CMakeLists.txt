@@ -44,6 +44,9 @@ symlink_tool_to_root(boyo)
 # Add unit tests
 add_subdirectory(src/unit_tests)
 
+# Add examples
+add_subdirectory(examples)
+
 # Create symlink for compile_commands.json in project root for clangd
 if(CMAKE_EXPORT_COMPILE_COMMANDS)
     execute_process(
